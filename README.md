@@ -1,3 +1,16 @@
+## thanks.dev CLI script
+
+### Purpose
+This shell script can be used to upload a repositories manifest files to thanks.dev as part of a CI/CD pipeline
+
+### Prerequisites
+- `find`
+- `curl`
+- `jq`
+- `base64`
+
+### Instructions
+
 This script should be run via curl:
 ```
 INGEST_KEY=<ingest_token> ENTITY=<entity_name> REPOSITORY=<repo_name> sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
