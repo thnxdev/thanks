@@ -79,19 +79,21 @@ main() {
     -print0 \
   | while read -d $'\0' m
   do
-    # JS
-    if [[ ! -z "$m" ]] && [[ "$ENABLE_JS" = "yes" ]] && [[ "$m" =~ $JS_REGEX ]]; then
-      upload "$m"
-    fi
+    if [[ ! -z "$m" ]]; then
+      # JS
+      if [[ "$ENABLE_JS" = "yes" ]] && [[ "$m" =~ $JS_REGEX ]]; then
+        upload "$m"
+      fi
 
-    # RS
-    if [[ ! -z "$m" ]] && [[ "$ENABLE_RS" = "yes" ]] && [[ "$m" =~ $RS_REGEX ]]; then
-      upload "$m"
-    fi
+      # RS
+      if [[ "$ENABLE_RS" = "yes" ]] && [[ "$m" =~ $RS_REGEX ]]; then
+        upload "$m"
+      fi
 
-    # GO
-    if [[ ! -z "$m" ]] && [[ "$ENABLE_GO" = "yes" ]] && [[ "$m" =~ $GO_REGEX ]]; then
-      upload "$m"
+      # GO
+      if [[ "$ENABLE_GO" = "yes" ]] && [[ "$m" =~ $GO_REGEX ]]; then
+        upload "$m"
+      fi
     fi
   done
 }
