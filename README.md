@@ -10,8 +10,7 @@ This shell script can be used to upload a repositories manifest files to thanks.
 - `base64`
 
 ### Instructions
-
-This script should be run via curl:
+This script scans the current working directory for manifest files. It should be run as follows:
 ```
 INGEST_KEY=<ingest_token> ENTITY=<entity_name> REPOSITORY=<repo_name> sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
 ```
