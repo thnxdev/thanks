@@ -67,14 +67,14 @@ main() {
   RS_REGEX='cargo\.toml$'
   GO_REGEX='go\.mod$'
 
-  find . \
+  find * \
     -type f \
     \( \
       -iname package.json -o \
       -iname cargo.toml -o \
       -iname go.mod \
     \) \
-    -not -path './node_modules/*' \
+    -not -path 'node_modules/*' \
     -print0 \
   | while read -d $'\0' m
   do
