@@ -38,7 +38,7 @@ upload() {
     '{version:1,entity:$entity,repository:$repo,path:$path,content:$content}' \
   )
   resp=$(curl \
-    -fsSL \
+    -sSL \
     -XPOST \
     -H "content-type: application/json" \
     -H "ingest-key: $INGEST_KEY" \
@@ -47,8 +47,7 @@ upload() {
   )
   ok=$(echo "$resp" | jq '.ok')
   if [[ ! "$ok" = "true" ]]; then
-    echo "ERROR: unexpected server response"
-    echo "$resp"
+    echo "ERROR: $resp"
     exit 1
   fi
 }
