@@ -31,6 +31,7 @@ upload() {
   echo "processing $fn"
   content=$(cat "$fn" | base64)
   payload=$(jq -n \
+    -c \
     --arg entity "$ENTITY" \
     --arg repo "$REPOSITORY" \
     --arg path "$fn" \
@@ -41,7 +42,7 @@ upload() {
     -sSL \
     -XPOST \
     -H "content-type: application/json" \
-    -H "ingest-key: $INGEST_KEY" \
+    -H "INGEST-KEY: $INGEST_KEY" \
     "$API_URL" \
     -d "$payload" \
   )
