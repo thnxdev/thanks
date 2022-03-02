@@ -37,7 +37,7 @@ upload() {
     '{version:1,entities:($entities | split(",")),repository:$repo,path:$path,content:$content}' \
   )
   curl \
-    -sSL \
+    -fsSL \
     -XPOST \
     -H "content-type: application/json" \
     -H "INGEST-KEY: $INGEST_KEY" \
