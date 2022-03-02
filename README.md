@@ -12,15 +12,13 @@ This shell script can be used to upload a repositories manifest files to thanks.
 ### Instructions
 This script scans the current working directory for manifest files. It should be run as follows:
 ```
-INGEST_KEY=<ingest_token> ENTITY=<entity_name> REPOSITORY=<repo_name> sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
+INGEST_KEY=<ingest_token> ENTITIES=<entity_paths> REPOSITORY=<repo_name> sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
 ```
 
 Respects the following environment variables:
-  - `ENABLE_JS`     - defaults to 'yes', set to 'no' if package.json files are to be ignored
-  - `ENABLE_RS`     - defaults to 'yes', set to 'no' if cargo.toml files are to be ignored
-  - `ENABLE_GO`     - defaults to 'yes', set to 'no' if go.mod files are to be ignored
+  - `ENABLE_PACKAGELOCK_JSON`     - defaults to 'yes', set to 'no' if package.json files are to be ignored
+  - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
 
 You can also pass some arguments to the script to set some of these options:
-  - `--disable-js` has the same behavior as setting `ENABLE_JS` to 'no'
-  - `--disable-rs` has the same behavior as setting `ENABLE_RS` to 'no'
-  - `--disable-go` has the same behavior as setting `ENABLE_GO` to 'no'
+  - `--disable-packagelock-json has the same behavior as setting `ENABLE_PACKAGELOCK_JSON`to 'no'
+  - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'
