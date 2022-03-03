@@ -16,9 +16,9 @@ INGEST_KEY=<ingest_token> ENTITIES=<entity_paths> REPOSITORY=<repo_name> sh -c "
 ```
 
 Respects the following environment variables:
-  - `ENABLE_PACKAGELOCK_JSON`     - defaults to 'yes', set to 'no' if package.json files are to be ignored
   - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
+  - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if go.list files are to be ignored
 
 You can also pass some arguments to the script to set some of these options:
-  - `--disable-packagelock-json has the same behavior as setting `ENABLE_PACKAGELOCK_JSON`to 'no'
   - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'
+  - `--disable-pomxml has the same behavior as setting `ENABLE_POMXML to 'no'
