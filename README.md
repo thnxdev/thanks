@@ -17,7 +17,7 @@ INGEST_KEY=<ingest_token> ENTITIES=<entity_paths> REPOSITORY=<repo_name> sh -c "
 
 Respects the following environment variables:
   - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
-  - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if go.list files are to be ignored
+  - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if pom.xml files are to be ignored
 
 You can also pass some arguments to the script to set some of these options:
   - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'

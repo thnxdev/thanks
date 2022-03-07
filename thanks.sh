@@ -8,7 +8,6 @@
 #   ENABLE_POMXML               - defaults to yes, set to no if pom.xml files are to be ignored
 #
 # You can also pass some arguments to the script to set some of these options:
-#   --disable-packagelock-json has the same behavior as setting ENABLE_PACKAGELOCK_JSON to 'no'
 #   --disable-golist has the same behavior as setting ENABLE_GOLIST to 'no'
 #   --disable-pomxml has the same behavior as setting ENABLE_POMXML to 'no'
 #
@@ -51,16 +50,11 @@ main() {
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
-      --disable-packagelock-json) ENABLE_PACKAGELOCK_JSON=no ;;
       --disable-golist) ENABLE_GOLIST=no ;;
       --disable-pomxml) ENABLE_POMXML=no ;;
     esac
     shift
   done
-
-  if [[ "$ENABLE_PACKAGELOCK_JSON" = "yes" ]] && [[ -e "package-lock.json" ]]; then
-    upload "package-lock.json"
-  fi
 
   if [[ "$ENABLE_GOLIST" = "yes" ]] && [[ -e "go.list" ]]; then
     upload "go.list"
