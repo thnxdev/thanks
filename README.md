@@ -17,8 +17,10 @@ INGEST_KEY=<ingest_token> ENTITIES=<entity_paths> REPOSITORY=<repo_name> sh -c "
 
 Respects the following environment variables:
   - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
+  - `ENABLE_JS                    - defaults to 'yes', set to 'no' if package.json, package-lock.json, yarn.lock files are to be ignored
   - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if pom.xml files are to be ignored
 
 You can also pass some arguments to the script to set some of these options:
   - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'
+  - `--disable-packagelock has the same behavior as setting `ENABLE_JS to 'no'
   - `--disable-pomxml has the same behavior as setting `ENABLE_POMXML to 'no'
