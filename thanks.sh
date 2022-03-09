@@ -1,84 +1,146 @@
 #!/bin/sh
-#
-# This script should be run via curl:
-#   INGEST_KEY=_ingest_token_ ENTITIES=_entity_paths_ REPOSITORY=_repo_name_ sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
-#
-# Respects the following environment variables:
-#   - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
-#   - `ENABLE_JS                    - defaults to 'yes', set to 'no' if package.json, package-lock.json, yarn.lock files are to be ignored
-#   - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if pom.xml files are to be ignored
-#
-# You can also pass some arguments to the script to set some of these options:
-#   - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'
-#   - `--disable-js has the same behavior as setting `ENABLE_JS to 'no'
-#   - `--disable-pomxml has the same behavior as setting `ENABLE_POMXML to 'no'
 set -e
 
 [[ -z "$INGEST_KEY" ]] && echo "INGEST_KEY not set" && exit 1
-[[ -z "$ENTITIES" ]] && echo "ENTITIES not set" && exit 1
-[[ -z "$REPOSITORY" ]] && echo "REPOSITORY not set" && exit 1
 
 # Default settings
 API_URL=${API_URL:-https://api.thanks.dev/v1/ingest}
-ENABLE_GOLIST=${ENABLE_GOLIST:-yes}
-ENABLE_JS=${ENABLE_JS:-yes}
-ENABLE_POMXML=${ENABLE_POMXML:-yes}
+ENTITY=""
+REPO=""
+OWN_MODULES=""
+OWN_SCOPES=""
 
 
 upload() {
-  echo "processing $@"
-  data=""
-  while [[ $# -gt 0 ]]; do
-    fc=$(cat "$1" | base64)
-    if [[ ! -z "$data" ]]; then
-      data="${data}#"
-    fi
-    data="${data}${1}:${fc}"
-    shift
-  done
-  payload=$(jq \
-    -n \
-    -c \
-    --arg entities "$ENTITIES" \
-    --arg repo "$REPOSITORY" \
-    --arg data "$data" \
-    '{version:2,entities:($entities | split(",")),repository:$repo,data:($data | split("#") | map(split(":") | {path:.[0],content:.[1]}))}' \
-  )
   curl \
     -fsSL \
     -XPOST \
     -H "content-type: application/json" \
     -H "INGEST-KEY: $INGEST_KEY" \
     "$API_URL" \
-    -d "$payload"
+    -d "$1"
+}
+
+process_go_list() {
+  data=$(cat go.list | base64)
+  payload=$(jq \
+    -n \
+    -c \
+    --arg entity "$ENTITY" \
+    --arg repo "$REPO" \
+    --arg own "$OWN_MODULES" \
+    --arg data "$data" \
+    '{version:2,entity:$entity,repo:$repo,type:"go.list",ownModules:($own | split(",")),data:$data}' \
+  )
+  upload "$payload"
+}
+
+process_pom() {
+  data=$(cat pom.xml | base64)
+  payload=$(jq \
+    -n \
+    -c \
+    --arg entity "$ENTITY" \
+    --arg repo "$REPO" \
+    --arg data "$data" \
+    '{version:2,entity:$entity,repo:$repo,type:"pom.xml",data:$data}' \
+  )
+  upload "$payload"
+}
+
+process_js() {
+  content=$(cat package.json | base64)
+  data="package.json:${content}"
+  if [[ -e "package-lock.json" ]]; then
+    content=$(cat package-lock.json | base64)
+    data="${data}#package-lock.json:${content}"
+  elif [[ -e "yarn.lock" ]]; then
+    content=$(cat yarn.lock | base64)
+    data="${data}#yarn.lock:${content}"
+  fi
+  payload=$(jq \
+    -n \
+    -c \
+    --arg entity "$ENTITY" \
+    --arg repo "$REPO" \
+    --arg ownModules "$OWN_MODULES" \
+    --arg ownScopes "$OWN_SCOPES" \
+    --arg data "$data" \
+    '{version:2,entity:$entity,repo:$repo,type:"package.json",ownModules:($ownModules | split(",")),ownScopes:($ownScopes | split(",")),data:($data | split("#") | map(split(":") | {path:.[0],content:.[1]}))}' \
+  )
+  upload "$payload"
+}
+
+print_help() {
+  echo "THANKS.DEV CLI manifest uploader."
+  echo
+  echo "Usage: INGEST_KEY=<ingest-key> $0 [options]"
+  echo "    options:"
+  echo "        --type (go.list,pom.xml,package.json)     [required]"
+  echo "        --entity <entity>                         [required]"
+  echo "        --repo <repo>                             [required]"
+  echo "        --own-module <module>"
+  echo "        --own-scope <scope>"
+  echo
 }
 
 main() {
+  TYPE=""
+
   # Parse arguments
   while [[ $# -gt 0 ]]; do
     case $1 in
-      --disable-golist) ENABLE_GOLIST=no ;;
-      --disable-pomxml) ENABLE_POMXML=no ;;
+      --type)
+        TYPE="$2"
+        shift
+        ;;
+      --entity)
+        ENTITY="$2"
+        shift
+        ;;
+      --repo)
+        REPO="$2"
+        shift
+        ;;
+      --own-module)
+        if [[ ! -z "$OWN_MODULES" ]]; then
+          OWN_MODULES="${OWN_MODULES},"
+        fi
+        OWN_MODULES="${OWN_MODULES}${2}"
+        shift
+        ;;
+      --own-scope)
+        if [[ ! -z "$OWN_SCOPES" ]]; then
+          OWN_SCOPES="${OWN_SCOPES},"
+        fi
+        OWN_SCOPES="${OWN_SCOPES}${2}"
+        shift
+        ;;
+      --help)
+        print_help
+        exit 1
+        ;;
+      *)
+        print_help
+        exit 1
+        ;;
     esac
     shift
   done
 
-  if [[ "$ENABLE_GOLIST" = "yes" ]] && [[ -e "go.list" ]]; then
-    upload "go.list"
+  [[ -z "$ENTITY" ]] && print_help && exit 1
+  [[ -z "$REPO" ]] && print_help && exit 1
+
+  if [[ "$TYPE" = "go.list" ]] && [[ -e "go.list" ]]; then
+    process_go_list
   fi
 
-  if [[ "$ENABLE_JS" = "yes" ]]; then
-    if [[ -e "package.json" ]] && [[ -e "package-lock.json" ]]; then
-      upload "package.json" "package-lock.json"
-    elif [[ -e "package.json" ]] && [[ -e "yarn.lock" ]]; then
-      upload "package.json" "yarn.lock"
-    elif [[ -e "package.json" ]]; then
-      upload "package.json"
-    fi
+  if [[ "$TYPE" = "pom.xml" ]] && [[ -e "pom.xml" ]]; then
+    process_pom
   fi
 
-  if [[ "$ENABLE_POMXML" = "yes" ]] && [[ -e "pom.xml" ]]; then
-    upload "pom.xml"
+  if [[ "$TYPE" = "package.json" ]] && [[ -e "package.json" ]]; then
+    process_js
   fi
 }
 

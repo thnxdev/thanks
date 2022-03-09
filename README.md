@@ -12,15 +12,11 @@ This shell script can be used to upload a repositories manifest files to thanks.
 ### Instructions
 This script scans the current working directory for manifest files. It should be run as follows:
 ```
-INGEST_KEY=<ingest_token> ENTITIES=<entity_paths> REPOSITORY=<repo_name> sh -c "$(curl -fsSL https://raw.githubusercontent.com/thnxdev/thanks/master/thanks.sh)"
+Usage: INGEST_KEY=<ingest-key> /Users/nehzata/Documents/td/thanks/thanks.sh [options]
+    options:
+        --type (go.list,pom.xml,package.json)     [required]
+        --entity <entity>                         [required]
+        --repo <repo>                             [required]
+        --own-module <module>
+        --own-scope <scope>
 ```
-
-Respects the following environment variables:
-  - `ENABLE_GOLIST                - defaults to 'yes', set to 'no' if go.list files are to be ignored
-  - `ENABLE_JS                    - defaults to 'yes', set to 'no' if package.json, package-lock.json, yarn.lock files are to be ignored
-  - `ENABLE_POMXML                - defaults to 'yes', set to 'no' if pom.xml files are to be ignored
-
-You can also pass some arguments to the script to set some of these options:
-  - `--disable-golist has the same behavior as setting `ENABLE_GOLIST to 'no'
-  - `--disable-packagelock has the same behavior as setting `ENABLE_JS to 'no'
-  - `--disable-pomxml has the same behavior as setting `ENABLE_POMXML to 'no'
